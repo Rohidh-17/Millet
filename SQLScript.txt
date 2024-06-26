@@ -1,0 +1,648 @@
+
+USE [MiletOnLineShopping]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_Admin_Login]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[sp_Admin_Login](@EMailID VARCHAR(60),@Password VARCHAR(250))
+AS
+SELECT * FROM tbl_AdminRegistration WHERE EMailID=@EMailID AND Password=@Password AND Status=1
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_AdminRegistration_Delete]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[sp_AdminRegistration_Delete](@EMailID VARCHAR(60))
+AS
+DELETE FROM tbl_AdminRegistration WHERE EMailID=@EMailID
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_AdminRegistration_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[sp_AdminRegistration_GetAll]
+AS
+SELECT * FROM tbl_AdminRegistration
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_AdminRegistration_Insert]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[sp_AdminRegistration_Insert](@EMailID VARCHAR(60),@Password VARCHAR(250),
+@EmployeeName VARCHAR(30),@MobileNo VARCHAR(10))
+AS
+INSERT INTO tbl_AdminRegistration(EMailID,Password,EmployeeName,MobileNo)
+VALUES(@EMailID,@Password,@EmployeeName,@MobileNo)
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_Banner_Image_Delete]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_Banner_Image_Delete](@BannerCode INT)
+AS
+DELETE FROM tbl_Banner_Image WHERE BannerCode=@BannerCode
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_Banner_Image_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_Banner_Image_GetAll]
+AS
+SELECT * FROM tbl_Banner_Image
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_Banner_Image_Insert]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_Banner_Image_Insert](@BannerCode INT,@ImageName VARCHAR(50))
+AS
+INSERT INTO tbl_Banner_Image(BannerCode,ImageName) VALUES(@BannerCode,@ImageName)
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_Banner_Image_Max_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_Banner_Image_Max_GetAll]
+AS
+DECLARE @BannerCode INT
+SELECT BannerCode=ISNULL(MAX(BannerCode),0)+1 FROM tbl_Banner_Image
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_CategoryDetails_Delete]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_CategoryDetails_Delete](@CategoryCode INT)
+AS
+	DELETE FROM tbl_CategoryDetails WHERE CategoryCode=@CategoryCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_CategoryDetails_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_CategoryDetails_GetAll](@CategoryCode INT=NULL, @Status BIT=NULL)
+AS
+	SELECT * FROM tbl_CategoryDetails WHERE CategoryCode=ISNULL(@CategoryCode, CategoryCode) AND Status=ISNULL(@Status, Status)
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_CategoryDetails_Insert_Update]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[sp_CategoryDetails_Insert_Update](@CategoryCode INT=NULL, @CategoryName VARCHAR(150),
+@Status BIT)
+AS
+	IF @CategoryCode IS NULL
+	BEGIN
+		SELECT @CategoryCode=ISNULL(MAX(CategoryCode),0)+1 FROM tbl_CategoryDetails
+		INSERT INTO tbl_CategoryDetails (CategoryCode, CategoryName, Status) 
+		VALUES(@CategoryCode, @CategoryName,@Status)
+	END  
+	ELSE
+	BEGIN
+		UPDATE tbl_CategoryDetails SET CategoryCode=@CategoryCode, CategoryName=@CategoryName, Status=@Status
+		WHERE CategoryCode=@CategoryCode
+	END  
+SELECT CategoryCode=@CategoryCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_CategoryDetailsImage_Insert]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_CategoryDetailsImage_Insert](@CategoryCode INT, @ImageName VARCHAR(40))
+AS
+	UPDATE tbl_CategoryDetails SET ImageName=@ImageName WHERE CategoryCode=@CategoryCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_Product_Initial_Unit_Rate_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_Product_Initial_Unit_Rate_GetAll](@ProductCode INT)
+AS
+	SELECT TOP 1 ProductCode, Unit, Rate FROM tbl_ProductDetails_Data WHERE ProductCode=@ProductCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_Product_ProductData_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[sp_Product_ProductData_GetAll](@ProductCode INT=NULL,@CategoryCode INT=null,@ProductID uniqueidentifier=null)
+AS
+	SELECT ProductID,pd.ProductCode, ProductName, ShortDescription,pd.CategoryCode, ImageCode,pdi.ImageName,LongDescription, cd.CategoryName,
+	Unit=ISNULL((SELECT TOP 1 Unit FROM tbl_ProductDetails_Data pdd WHERE pdd.ProductCode=pd.ProductCode ORDER BY UnitCode),''),
+	Rate=ISNULL((SELECT TOP 1 Rate FROM tbl_ProductDetails_Data pdd WHERE pdd.ProductCode=pd.ProductCode ORDER BY UnitCode),0)
+	FROM tbl_ProductDetails pd 
+	INNER JOIN tbl_ProductDetails_Image pdi ON pd.ProductCode=pdi.ProductCode
+	INNER JOIN tbl_CategoryDetails cd ON pd.CategoryCode=cd.CategoryCode
+	WHERE DefaultImage=1 AND pd.ProductCode=ISNULL(@ProductCode, pd.ProductCode)
+	AND pd.CategoryCode=ISNULL(@CategoryCode,pd.CategoryCode)
+	AND pd.ProductID=ISNULL(@ProductID,pd.ProductID)
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Category_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Category_GetAll](@CategoryCode INT)
+AS
+	SELECT * FROM tbl_ProductDetails WHERE CategoryCode=@CategoryCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Default_Image_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Default_Image_GetAll](@ProductCode INT=null,@ProductID uniqueidentifier=null)
+AS
+	SELECT i.* FROM tbl_ProductDetails_Image i INNER JOIN tbl_ProductDetails p ON i.ProductCode=p.ProductCode
+	WHERE i.ProductCode=ISNULL(@ProductCode,i.ProductCode)
+	AND ProductID=ISNull(@ProductID,ProductID) AND DefaultImage=1
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Delete]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Delete](@ProductCode INT)
+AS
+	DELETE FROM tbl_ProductDetails_Data WHERE ProductCode=@ProductCode
+
+	DELETE FROM tbl_ProductDetails WHERE ProductCode=@ProductCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_GetAll](@ProductCode INT=NULL,@ProductID uniqueidentifier=null)
+AS
+SELECT  ProductCode, ProductID,ProductName, ShortDescription, LongDescription,pd.CategoryCode, cd.CategoryName FROM tbl_ProductDetails pd INNER JOIN tbl_CategoryDetails cd ON pd.CategoryCode=cd.CategoryCode 
+WHERE ProductCode=ISNULL(@ProductCode, ProductCode)  AND ProductID=ISNULL(@ProductID,ProductID)
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Image_DefaultImage_Update]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Image_DefaultImage_Update](@ImageCode INT,@ProductCode INT)
+AS
+UPDATE tbl_ProductDetails_Image SET DefaultImage=0 WHERE ProductCode=@ProductCode 
+UPDATE tbl_ProductDetails_Image SET DefaultImage=1 WHERE ImageCode=@ImageCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Image_Delete]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Image_Delete](@ImageCode INT)
+AS
+DELETE FROM tbl_ProductDetails_Image WHERE ImageCode=@ImageCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Image_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Image_GetAll](@ProductCode INT=null,@ProductID uniqueidentifier=null)
+AS
+	SELECT i.* FROM tbl_ProductDetails_Image i INNER JOIN tbl_ProductDetails p ON i.ProductCode=p.ProductCode
+	WHERE i.ProductCode=ISNULL(@ProductCode,i.ProductCode)
+	AND ProductID=ISNull(@ProductID,ProductID)
+	ORDER BY DefaultImage DESC
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Image_Insert]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Image_Insert]( @ProductCode INT, @DefaultImage BIT)
+AS
+DECLARE @ImageCode INT
+SELECT @ImageCode=ISNULL(MAX(ImageCode),0)+1 FROM tbl_ProductDetails_Image
+IF @DefaultImage=1
+	UPDATE tbl_ProductDetails_Image SET DefaultImage=0 WHERE ProductCode=@ProductCode
+IF NOT EXISTS(SELECT * FROM tbl_ProductDetails_Image WHERE ProductCode=@ProductCode)
+	SELECT @DefaultImage=1
+INSERT INTO tbl_ProductDetails_Image(ImageCode, ProductCode, DefaultImage)VALUES(@ImageCode, @ProductCode, @DefaultImage)
+SELECT ImageCode=@ImageCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Image_Update]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Image_Update](@ImageCode INT,@ImageName VARCHAR(100))
+AS
+	UPDATE tbl_ProductDetails_Image SET ImageName=@ImageName WHERE ImageCode=@ImageCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Insert_Update]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Insert_Update](@ProductCode INT=NULL, @ProductName VARCHAR(100), @ShortDescription VARCHAR(MAX), @LongDescription VARCHAR(MAX), @CategoryCode INT)
+AS
+	IF @ProductCode IS NULL
+	BEGIN
+		SELECT @ProductCode=ISNULL(MAX(ProductCode),0)+1 FROM tbl_ProductDetails
+		INSERT INTO tbl_ProductDetails(ProductCode,ProductName,ShortDescription,LongDescription, CategoryCode)
+		VALUES(@ProductCode,@ProductName,@ShortDescription,@LongDescription, @CategoryCode)
+	END
+	ELSE
+	BEGIN
+		UPDATE tbl_ProductDetails SET ProductCode=@ProductCode,ProductName=@ProductName,ShortDescription=@ShortDescription,LongDescription=@LongDescription, CategoryCode=@CategoryCode
+		WHERE ProductCode=@ProductCode
+		DELETE FROM tbl_ProductDetails_Data WHERE ProductCode=@ProductCode
+	END
+SELECT ProductCode=@ProductCode
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Price_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Price_GetAll](@ProductCode INT)
+AS
+	SELECT * FROM tbl_ProductDetails pd INNER JOIN tbl_ProductDetails_Data pdd
+	ON pd.ProductCode=pdd.ProductCode 
+	INNER JOIN tbl_ProductDetails_Image pdi ON pd.ProductCode=pdi.ProductCode
+	WHERE pd.ProductCode=@ProductCode AND DefaultImage=1
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetails_Price_ProductID_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetails_Price_ProductID_GetAll](@ProductID uniqueidentifier)
+AS
+	SELECT * FROM tbl_ProductDetails pd INNER JOIN tbl_ProductDetails_Data pdd
+	ON pd.ProductCode=pdd.ProductCode 
+	INNER JOIN tbl_ProductDetails_Image pdi ON pd.ProductCode=pdi.ProductCode
+	WHERE pd.ProductID=@ProductID AND DefaultImage=1
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetailsData_GetAll]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetailsData_GetAll](@ProductCode INT)
+AS
+	SELECT Unit, Rate FROM tbl_ProductDetails_Data WHERE ProductCode=@ProductCode
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ProductDetailsData_Insert]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_ProductDetailsData_Insert](@ProductCode INT, @Unit VARCHAR(100), @Rate VARCHAR(100))
+AS
+	INSERT INTO tbl_ProductDetails_Data(ProductCode, Unit, Rate) VALUES(@ProductCode, @Unit, @Rate)
+
+
+GO
+/****** Object:  Table [dbo].[tbl_AdminRegistration]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[tbl_AdminRegistration](
+	[EMailID] [varchar](60) NOT NULL,
+	[Password] [varchar](250) NULL,
+	[EmployeeName] [varchar](30) NULL,
+	[MobileNo] [varchar](10) NULL,
+	[Status] [numeric](1, 0) NULL,
+ CONSTRAINT [PK_Admin_EMailID] PRIMARY KEY CLUSTERED 
+(
+	[EMailID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[tbl_Banner_Image]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[tbl_Banner_Image](
+	[BannerCode] [int] NOT NULL,
+	[ImageName] [varchar](50) NULL,
+ CONSTRAINT [PK_BannerCode] PRIMARY KEY CLUSTERED 
+(
+	[BannerCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[tbl_CategoryDetails]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[tbl_CategoryDetails](
+	[CategoryCode] [int] NOT NULL,
+	[CategoryName] [varchar](150) NULL,
+	[ImageName] [varchar](40) NULL,
+	[Status] [bit] NULL,
+	[CategoryID] [uniqueidentifier] NULL,
+ CONSTRAINT [pk_CategoryCode_CategoryDetails] PRIMARY KEY CLUSTERED 
+(
+	[CategoryCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[tbl_ProductDetails]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[tbl_ProductDetails](
+	[ProductCode] [int] NOT NULL,
+	[ProductName] [varchar](100) NULL,
+	[ShortDescription] [varchar](max) NULL,
+	[LongDescription] [varchar](max) NULL,
+	[CategoryCode] [int] NULL,
+	[ProductID] [uniqueidentifier] NULL,
+ CONSTRAINT [pk_ProductCode_ProductDetails] PRIMARY KEY CLUSTERED 
+(
+	[ProductCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[tbl_ProductDetails_Data]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[tbl_ProductDetails_Data](
+	[ProductCode] [int] NULL,
+	[Unit] [varchar](100) NULL,
+	[Rate] [varchar](100) NULL,
+	[UnitCode] [int] NULL
+) ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[tbl_ProductDetails_Image]    Script Date: 24-06-2024 06:00:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[tbl_ProductDetails_Image](
+	[ImageCode] [int] NOT NULL,
+	[ProductCode] [int] NULL,
+	[ImageName] [varchar](100) NULL,
+	[DefaultImage] [bit] NULL,
+ CONSTRAINT [pk_ImageCode_ProductImage] PRIMARY KEY CLUSTERED 
+(
+	[ImageCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+INSERT [dbo].[tbl_AdminRegistration] ([EMailID], [Password], [EmployeeName], [MobileNo], [Status]) VALUES (N'admin@gmail.com', N'al+1VoSb0uU=', N'Admin', N'9842086217', CAST(1 AS Numeric(1, 0)))
+GO
+INSERT [dbo].[tbl_Banner_Image] ([BannerCode], [ImageName]) VALUES (1, N'Banner1.png')
+GO
+INSERT [dbo].[tbl_CategoryDetails] ([CategoryCode], [CategoryName], [ImageName], [Status], [CategoryID]) VALUES (1, N'Millet Basket', N'Category1.png', 1, N'dabbbfb4-4f8c-4613-bdbd-b7ea3a5b456d')
+GO
+INSERT [dbo].[tbl_CategoryDetails] ([CategoryCode], [CategoryName], [ImageName], [Status], [CategoryID]) VALUES (2, N'Siridhaya', N'Category2.png', 1, N'c728c2ef-acab-43a1-85f5-c16bb3dcdd63')
+GO
+INSERT [dbo].[tbl_ProductDetails] ([ProductCode], [ProductName], [ShortDescription], [LongDescription], [CategoryCode], [ProductID]) VALUES (1, N'Millet Pizza Base Organic 6Pcs Per Pack (200gm)', N'$h1#Millet Pizza Base Organic 6Pcs Per Pack (200gm)$/h1#
+', N'$h1#Millet Pizza Base Organic 6Pcs Per Pack (200gm)$/h1#
+', 1, N'b156aa60-c4e4-460f-a649-545eea869c60')
+GO
+INSERT [dbo].[tbl_ProductDetails] ([ProductCode], [ProductName], [ShortDescription], [LongDescription], [CategoryCode], [ProductID]) VALUES (2, N'Siridhanya top Millets', N'$h1#Siridhanya Grain Combo Organic Millet Pack of 5 (5kg-Each 1kg) | Positive Millets due to its balanced Nutritional Profile | Kodo , Foxtail, Little, Barnyard , Browntop Millets$/h1#
+', N'$h1#Siridhanya Grain Combo Organic Millet Pack of 5 (5kg-Each 1kg) | Positive Millets due to its balanced Nutritional Profile | Kodo , Foxtail, Little, Barnyard , Browntop Millets$/h1#
+', 2, N'00e768ef-5513-4b8e-9fe5-24442c90f971')
+GO
+INSERT [dbo].[tbl_ProductDetails] ([ProductCode], [ProductName], [ShortDescription], [LongDescription], [CategoryCode], [ProductID]) VALUES (3, N'Millet Pizza Base Organic 6Pcs Per Pack (500gm)', N'$h1#Millet Pizza Base Organic 6Pcs Per Pack (200gm)$/h1#
+', N'$h1#Millet Pizza Base Organic 6Pcs Per Pack (200gm)$/h1#
+', 1, N'518029b9-0dc1-4f7e-87e9-160db3311376')
+GO
+INSERT [dbo].[tbl_ProductDetails] ([ProductCode], [ProductName], [ShortDescription], [LongDescription], [CategoryCode], [ProductID]) VALUES (4, N'Siridhanya top Millets-1', N'$h1#Siridhanya Grain Combo Organic Millet Pack of 6 (5kg-Each 1kg) | Positive Millets due to its balanced Nutritional Profile | Kodo , Foxtail, Little, Barnyard , Browntop Millets$/h1#
+', N'$h1#Siridhanya Grain Combo Organic Millet Pack of 5 (5kg-Each 1kg) | Positive Millets due to its balanced Nutritional Profile | Kodo , Foxtail, Little, Barnyard , Browntop Millets$/h1#
+', 1, N'3523f5ef-8b53-41a2-8584-17c7e7adedc4')
+GO
+INSERT [dbo].[tbl_ProductDetails] ([ProductCode], [ProductName], [ShortDescription], [LongDescription], [CategoryCode], [ProductID]) VALUES (5, N'Millet Pizza Base Organic 6Pcs Per Pack (600gm)', N'$h1#Millet Pizza Base Organic 6Pcs Per Pack (200gm)$/h1#
+', N'$h1#Millet Pizza Base Organic 6Pcs Per Pack (200gm)$/h1#
+', 1, N'dd8432d6-aacc-4b33-9a44-769b7f9be9a6')
+GO
+INSERT [dbo].[tbl_ProductDetails] ([ProductCode], [ProductName], [ShortDescription], [LongDescription], [CategoryCode], [ProductID]) VALUES (6, N'Siridhanya top Millets-2', N'$h1#Siridhanya Grain Combo Organic Millet Pack of 7 (5kg-Each 1kg) | Positive Millets due to its balanced Nutritional Profile | Kodo , Foxtail, Little, Barnyard , Browntop Millets$/h1#
+', N'$h1#Siridhanya Grain Combo Organic Millet Pack of 5 (5kg-Each 1kg) | Positive Millets due to its balanced Nutritional Profile | Kodo , Foxtail, Little, Barnyard , Browntop Millets$/h1#
+', 1, N'd906d70d-0001-497b-b631-04fdf427c7b2')
+GO
+INSERT [dbo].[tbl_ProductDetails] ([ProductCode], [ProductName], [ShortDescription], [LongDescription], [CategoryCode], [ProductID]) VALUES (7, N'Millet Pizza Base Organic 6Pcs Per Pack (700gm)', N'$h1#Millet Pizza Base Organic 6Pcs Per Pack (200gm)$/h1#
+', N'$h1#Millet Pizza Base Organic 6Pcs Per Pack (200gm)$/h1#
+', 1, N'15e325d7-907a-455a-8007-9773f11988f1')
+GO
+INSERT [dbo].[tbl_ProductDetails] ([ProductCode], [ProductName], [ShortDescription], [LongDescription], [CategoryCode], [ProductID]) VALUES (8, N'Milet Basket -1', N'$h1#Siridhanya Grain Combo Organic Millet Pack of 15 (5kg-Each 1kg) | Positive Millets due to its balanced Nutritional Profile | Kodo , Foxtail, Little, Barnyard , Browntop Millets$/h1#$/h1#$/h1#$/h1#$/h1#$/h1#$/h1#$/h1#
+', N'$h1#$strong#Siridhanya Grain Combo$/strong# Organic Millet Pack of 15 (5kg-Each 1kg) | Positive Millets due to its balanced Nutritional Profile | Kodo , Foxtail, Little, Barnyard , Browntop Millets$/h1#$/h1#$/h1#$/h1#$/h1#$/h1#$/h1#$/h1#
+
+$ol#
+	$li#One$/li#
+	$li#Two$/li#
+	$li#Three$/li#
+$/ol#
+', 1, N'bc71701c-a73f-4228-b614-2a58247c42bd')
+GO
+INSERT [dbo].[tbl_ProductDetails] ([ProductCode], [ProductName], [ShortDescription], [LongDescription], [CategoryCode], [ProductID]) VALUES (9, N'aaa', N'asd fasdfasfdasf', N'asd fasdfasfdasf', 2, N'871fea3d-a780-479a-8e43-52f6c9da2db2')
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (1, N'200 Grams', N'200', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (2, N'5KG', N'1750', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (3, N'200 Grams', N'200', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (3, N'5KG', N'2750', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (4, N'400 Grams', N'400', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (8, N'900 Grams', N'800', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (8, N'85KG', N'8750', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (9, N'ML', N'1200', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (4, N'45KG', N'3750', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (5, N'500 Grams', N'500', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (5, N'15KG', N'5750', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (6, N'600 Grams', N'600', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (6, N'65KG', N'6750', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (7, N'7200 Grams', N'700', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Data] ([ProductCode], [Unit], [Rate], [UnitCode]) VALUES (7, N'75KG', N'7750', NULL)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (1, 1, N'1_1.png', 1)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (2, 1, N'2_1.jpg', 0)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (3, 1, N'3_1.png', 0)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (5, 2, N'5_2.png', 1)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (6, 2, N'6_2.png', 0)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (7, 3, N'1_1.png', 1)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (8, 3, N'2_1.jpg', 0)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (9, 4, N'3_1.png', 0)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (10, 4, N'5_2.png', 1)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (11, 5, N'1_1.png', 1)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (12, 5, N'2_1.jpg', 0)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (13, 6, N'3_1.png', 0)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (14, 6, N'5_2.png', 1)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (15, 7, N'1_1.png', 1)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (16, 7, N'2_1.jpg', 0)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (17, 8, N'3_1.png', 0)
+GO
+INSERT [dbo].[tbl_ProductDetails_Image] ([ImageCode], [ProductCode], [ImageName], [DefaultImage]) VALUES (18, 8, N'5_2.png', 1)
+GO
+SET ANSI_PADDING ON
+
+GO
+/****** Object:  Index [UQ_CategoryDetails_CategoryName]    Script Date: 24-06-2024 06:00:48 PM ******/
+ALTER TABLE [dbo].[tbl_CategoryDetails] ADD  CONSTRAINT [UQ_CategoryDetails_CategoryName] UNIQUE NONCLUSTERED 
+(
+	[CategoryName] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Index [UQ_Product_ProductID]    Script Date: 24-06-2024 06:00:48 PM ******/
+ALTER TABLE [dbo].[tbl_ProductDetails] ADD  CONSTRAINT [UQ_Product_ProductID] UNIQUE NONCLUSTERED 
+(
+	[ProductID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+
+GO
+/****** Object:  Index [UQ_ProductDetails_ProductName]    Script Date: 24-06-2024 06:00:48 PM ******/
+ALTER TABLE [dbo].[tbl_ProductDetails] ADD  CONSTRAINT [UQ_ProductDetails_ProductName] UNIQUE NONCLUSTERED 
+(
+	[ProductName] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[tbl_AdminRegistration] ADD  CONSTRAINT [DF_tbl_AdminRegistration_Status]  DEFAULT ((1)) FOR [Status]
+GO
+ALTER TABLE [dbo].[tbl_CategoryDetails] ADD  DEFAULT (newid()) FOR [CategoryID]
+GO
+ALTER TABLE [dbo].[tbl_ProductDetails] ADD  DEFAULT (newid()) FOR [ProductID]
+GO
+ALTER TABLE [dbo].[tbl_ProductDetails_Image] ADD  DEFAULT ((0)) FOR [DefaultImage]
+GO
+ALTER TABLE [dbo].[tbl_ProductDetails]  WITH CHECK ADD  CONSTRAINT [fk_CategoryCode_ProductDetails] FOREIGN KEY([CategoryCode])
+REFERENCES [dbo].[tbl_CategoryDetails] ([CategoryCode])
+GO
+ALTER TABLE [dbo].[tbl_ProductDetails] CHECK CONSTRAINT [fk_CategoryCode_ProductDetails]
+GO
+ALTER TABLE [dbo].[tbl_ProductDetails_Data]  WITH CHECK ADD  CONSTRAINT [fk_ProductCode_ProductCodeData] FOREIGN KEY([ProductCode])
+REFERENCES [dbo].[tbl_ProductDetails] ([ProductCode])
+GO
+ALTER TABLE [dbo].[tbl_ProductDetails_Data] CHECK CONSTRAINT [fk_ProductCode_ProductCodeData]
+GO
+ALTER TABLE [dbo].[tbl_ProductDetails_Image]  WITH CHECK ADD  CONSTRAINT [fk_ProductCode_ProductImage] FOREIGN KEY([ProductCode])
+REFERENCES [dbo].[tbl_ProductDetails] ([ProductCode])
+GO
+ALTER TABLE [dbo].[tbl_ProductDetails_Image] CHECK CONSTRAINT [fk_ProductCode_ProductImage]
+GO
